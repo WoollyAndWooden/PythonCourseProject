@@ -12,9 +12,9 @@ pause = False
 
 dt = 0
 logo = "Games/chip8-test-suite/1-chip8-logo.ch8"
-ibm = "Games/chip8-test-suite/2=ibm-logo.ch8"
+ibm = "Games/chip8-test-suite/2-ibm-logo.ch8"
 corax = "Games/chip8-test-suite/3-corax+.ch8"
-chip8 = Chip8("Games/INVADERS")
+chip8 = Chip8(corax)
 
 screenDebug = False
 

@@ -54,7 +54,8 @@ class Chip8:
         y = lambda opc = opcode: (opc >> 4) & 0x00f
         kk = lambda opc = opcode: opc & 0x00ff
         last = lambda opc = opcode: opc & 0x000f
-        first = lambda opc = opcode: opc & 0xF000
+        first = lambda opc = opcode: (opc >> 12) & 0xF
+        print(f"opcode: {hex(opcode)}, nnn: {hex(nnn())}, x: {hex(x())}, y: {hex(y())}, kk: {hex(kk())}, last: {hex(last())}, first: {hex(first())}")
 
 
 
@@ -70,7 +71,7 @@ class Chip8:
             if mode == 3:
                 return last() == instruction
             if mode == 4:
-                return kk == instruction
+                return kk() == instruction
 
         # Basic instruction set, set mode to 1
         mode = 1
@@ -86,39 +87,39 @@ class Chip8:
         # Non basic instructions, set mode to 2
         mode = 2
         # JP
-        if is_opcode(0x1000):
+        if is_opcode(0x1):
             self.program_counter = nnn(opcode)
             return
         # CAL addr:
-        if is_opcode(0x2000):
+        if is_opcode(0x2):
             self.stack_push(self.program_counter)
             self.program_counter = nnn()
             return
         # SE Vc, kk
-        if is_opcode(0x3000):
+        if is_opcode(0x3):
             if self.V[x()] == kk():
                 self.program_counter+=2
             return
         # SNE Vx, kk
-        if is_opcode(0x4000):
+        if is_opcode(0x4):
             if self.V[x()] != kk():
                 self.program_counter+=2
             return
         # SE Vx, Vy
-        if is_opcode(0x5000):
+        if is_opcode(0x5):
             if self.V[x()] == self.V[y()]:
                 self.program_counter+=2
             return
         # LD Vx, Vy
-        if is_opcode(0x6000):
+        if is_opcode(0x6):
             self.V[x()] = kk()
             return
         # ADD Vx
-        if(is_opcode(0x7000)):
+        if(is_opcode(0x7)):
             self.V[x()] += kk()
             return
         # Under 0x8 there are several instructions
-        if is_opcode(0x8000):
+        if is_opcode(0x8):
             # set comparator mode to 3
             mode = 3
             # LD Vx, Vy
@@ -169,32 +170,32 @@ class Chip8:
         # switch mode back to 2
         mode = 2
         # SNE Vx, Vy
-        if is_opcode(0x9000):
+        if is_opcode(0x9):
             if self.V[x()] != self.V[y()]:
                 self.program_counter += 2
             return
         # LD I
-        if is_opcode(0xA000):
+        if is_opcode(0xA):
             self.I = nnn()
             return
         # JP V0 addr
-        if is_opcode(0xB000):
+        if is_opcode(0xB):
             self.program_counter = nnn() + self.V[0]
             return
         # RND Vx, kk
-        if is_opcode(0xC000):
+        if is_opcode(0xC):
             self.V[x()] = randint(0, 255) & kk()
             return
         # DRW Vx, Vy. VF = collision
-        if is_opcode(0xD000):
+        if is_opcode(0xD):
             self.V[0xF] = self.Display.draw_sprite(self.V[x()], self.V[y()], self.Memory.Memory[self.I:], last())
             return
         # Two skips here
-        if is_opcode(0xE000):
+        if is_opcode(0xE):
             print(f"NOT IMPLEMENTED {hex(opcode).upper()}")
             return
         # There are several instructions under 0xF000
-        if is_opcode(0xF000):
+        if is_opcode(0xF):
             mode = 4
             # LD Vx, DT
             if is_opcode(0x07):
