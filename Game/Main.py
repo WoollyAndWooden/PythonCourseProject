@@ -1,7 +1,13 @@
 import pygame
 
 from Game.Chip8.Chip8 import Chip8
-from Game.Chip8.Config import DISPLAY_MULTIPLIER, DISPLAY_WIDTH, DISPLAY_HEIGHT, FOREGROUND_COLOUR, BACKGROUND_COLOUR
+from Game.Chip8.Config import (
+    DISPLAY_MULTIPLIER,
+    DISPLAY_WIDTH,
+    DISPLAY_HEIGHT,
+    FOREGROUND_COLOUR,
+    BACKGROUND_COLOUR,
+)
 
 pygame.init()
 size = lambda x: x * DISPLAY_MULTIPLIER
@@ -14,7 +20,9 @@ dt = 0
 logo = "Games/chip8-test-suite/1-chip8-logo.ch8"
 ibm = "Games/chip8-test-suite/2-ibm-logo.ch8"
 corax = "Games/chip8-test-suite/3-corax+.ch8"
-chip8 = Chip8(corax)
+flags = "Games/chip8-test-suite/4-flags.ch8"
+GAME = "Games/INVADERS"
+chip8 = Chip8(flags)
 
 screenDebug = False
 
@@ -29,12 +37,22 @@ while running:
             for j in i:
                 print("O", end="") if j else print(" ", end="")
             print("\n", end="")
-        print("----------------------------------------------------------------------------------")
+        print(
+            "----------------------------------------------------------------------------------"
+        )
     for i in range(DISPLAY_WIDTH):
         for j in range(DISPLAY_HEIGHT):
             try:
                 if chip8.Display.is_set(i, j):
-                    screen.fill(FOREGROUND_COLOUR, rect=pygame.Rect(i * DISPLAY_MULTIPLIER, j * DISPLAY_MULTIPLIER, DISPLAY_MULTIPLIER, DISPLAY_MULTIPLIER))
+                    screen.fill(
+                        FOREGROUND_COLOUR,
+                        rect=pygame.Rect(
+                            i * DISPLAY_MULTIPLIER,
+                            j * DISPLAY_MULTIPLIER,
+                            DISPLAY_MULTIPLIER,
+                            DISPLAY_MULTIPLIER,
+                        ),
+                    )
             except IndexError as err:
                 print(f"Error at: {i}, {j}")
                 running = False
@@ -47,7 +65,6 @@ while running:
     except Exception as err:
         pause = True
         print(f"Error ({err}) at PC {chip8.program_counter}")
-    chip8.program_counter+=2
 
     dt = clock.tick(60) / 1000
 

@@ -16,13 +16,15 @@ def check_bounds(func):
 
 class Display:
     def __init__(self) -> None:
-        self.pixels = [[False for i in range(DISPLAY_HEIGHT)] for j in range(DISPLAY_WIDTH)]
+        self.pixels = [
+            [False for i in range(DISPLAY_HEIGHT)] for j in range(DISPLAY_WIDTH)
+        ]
 
-    @check_bounds
+    # @check_bounds
     def set(self, x: int, y: int) -> None:
         self.pixels[x][y] = True
-    
-    @check_bounds
+
+    # @check_bounds
     def is_set(self, x: int, y: int) -> bool:
         return self.pixels[x][y]
 
@@ -34,10 +36,14 @@ class Display:
             for lx in range(num):
                 if (c & (0b10000000 >> lx)) == 0:
                     continue
-                pixel_collision = self.pixels[(lx + x) % DISPLAY_WIDTH][(ly + y) % DISPLAY_HEIGHT]
+                pixel_collision = self.pixels[(lx + x) % DISPLAY_WIDTH][
+                    (ly + y) % DISPLAY_HEIGHT
+                ]
                 self.pixels[(lx + x) % DISPLAY_WIDTH][(ly + y) % DISPLAY_HEIGHT] ^= True
 
         return pixel_collision
 
     def clear_display(self):
-        self.pixels = [[False for i in range(DISPLAY_HEIGHT)] for j in range(DISPLAY_WIDTH)]
+        self.pixels = [
+            [False for i in range(DISPLAY_HEIGHT)] for j in range(DISPLAY_WIDTH)
+        ]
