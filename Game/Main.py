@@ -1,8 +1,7 @@
 import pygame
 
-from Emulator.Chip8.Chip8 import Chip8
-from Emulator.Chip8.Config import DISPLAY_MULTIPLIER, DISPLAY_WIDTH, DISPLAY_HEIGHT, FOREGROUND_COLOUR, BACKGROUND_COLOUR
-from Emulator.Chip8.Memory import Memory
+from Game.Chip8.Chip8 import Chip8
+from Game.Chip8.Config import DISPLAY_MULTIPLIER, DISPLAY_WIDTH, DISPLAY_HEIGHT, FOREGROUND_COLOUR, BACKGROUND_COLOUR
 
 pygame.init()
 size = lambda x: x * DISPLAY_MULTIPLIER

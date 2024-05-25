@@ -1,4 +1,4 @@
-from Emulator.Chip8.Config import MEMORY_SIZE, CHARSET, CHARSET_LOAD_ADDRESS, PROGRAM_LOAD_ADDRESS
+from Game.Chip8.Config import MEMORY_SIZE, CHARSET, CHARSET_LOAD_ADDRESS, PROGRAM_LOAD_ADDRESS
 from numpy import fromfile, uint8
 
 

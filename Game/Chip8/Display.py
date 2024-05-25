@@ -1,6 +1,6 @@
 from functools import wraps
 
-from Emulator.Chip8.Config import DISPLAY_WIDTH, DISPLAY_HEIGHT
+from Game.Chip8.Config import DISPLAY_WIDTH, DISPLAY_HEIGHT
 
 
 def check_bounds(func):

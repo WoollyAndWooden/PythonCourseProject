@@ -1,9 +1,9 @@
 from functools import wraps
 from random import randint
 
-from Emulator.Chip8.Config import NO_OF_REGISTERS, PROGRAM_LOAD_ADDRESS, STACK_DEPTH, DEFAULT_SPRITE_HEIGHT
-from Emulator.Chip8.Display import Display
-from Emulator.Chip8.Memory import Memory
+from Game.Chip8.Config import NO_OF_REGISTERS, PROGRAM_LOAD_ADDRESS, STACK_DEPTH, DEFAULT_SPRITE_HEIGHT
+from Game.Chip8.Display import Display
+from Game.Chip8.Memory import Memory
 
 
 class Chip8:
