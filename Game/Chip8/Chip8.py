@@ -1,5 +1,6 @@
-from functools import wraps
 from random import randint
+
+import pygame
 
 from Game.Chip8.Config import (
     NO_OF_REGISTERS,
@@ -8,11 +9,12 @@ from Game.Chip8.Config import (
     DEFAULT_SPRITE_HEIGHT,
 )
 from Game.Chip8.Display import Display
+from Game.Chip8.Keyboard import Keyboard
 from Game.Chip8.Memory import Memory
 
 
 class Chip8:
-    def __init__(self, filepath: str) -> None:
+    def __init__(self, filepath: str, opcode_debug: bool = False) -> None:
         self.V = [0 for i in range(NO_OF_REGISTERS)]
         self.I = 0
         self.delay_timer = 0
@@ -22,8 +24,10 @@ class Chip8:
         self.stack = [0 for i in range(STACK_DEPTH)]
         self.Memory = Memory(filepath)
         self.Display = Display()
+        self.Keyboard = Keyboard()
         self.pop_counter = 0
         self.push_counter = 0
+        self.opcode_debug = opcode_debug
 
     def check_stack_in_bounds(self):
         if not (self.stack_pointer <= STACK_DEPTH):
@@ -34,15 +38,17 @@ class Chip8:
     def stack_push(self, val: int) -> None:
         self.stack_pointer += 1
         self.push_counter += 1
-        print(
-            f"At {hex(self._get_opcode()).upper()} SP: {self.stack_pointer}|{self.push_counter}"
-        )
+        if self.opcode_debug:
+            print(
+                f"At {hex(self._get_opcode()).upper()} SP: {self.stack_pointer}|{self.push_counter}"
+            )
         self.check_stack_in_bounds()
         self.stack[self.stack_pointer] = val
 
     def stack_pop(self) -> int:
         self.pop_counter += 1
-        print(f"At {hex(self._get_opcode()).upper()}|{self.pop_counter}")
+        if self.opcode_debug:
+            print(f"At {hex(self._get_opcode()).upper()}|{self.pop_counter}")
         self.check_stack_in_bounds()
         val = self.stack[self.stack_pointer]
         self.stack_pointer -= 1
@@ -67,9 +73,10 @@ class Chip8:
         kk = lambda opc=opcode: opc & 0x00FF
         last = lambda opc=opcode: opc & 0x000F
         first = lambda opc=opcode: (opc >> 12) & 0xF
-        print(
-            f"PC: {self.program_counter} opcode: {hex(opcode)}, nnn: {hex(nnn())}, x: {hex(x())}, y: {hex(y())}, kk: {hex(kk())}, last: {hex(last())}, first: {hex(first())}"
-        )
+        if self.opcode_debug:
+            print(
+                f"PC: {self.program_counter} opcode: {hex(opcode)}, nnn: {hex(nnn())}, x: {hex(x())}, y: {hex(y())}, kk: {hex(kk())}, last: {hex(last())}, first: {hex(first())}"
+            )
 
         # Comparator mode
         mode = 1
@@ -101,7 +108,8 @@ class Chip8:
         # JP
         if is_opcode(0x1):
             self.program_counter = nnn()
-            print(f"JP to {self.program_counter} from {self.program_counter}")
+            if self.opcode_debug:
+                print(f"JP to {self.program_counter} from {self.program_counter}")
             return
         # CAL addr:
         if is_opcode(0x2):
@@ -112,19 +120,22 @@ class Chip8:
         if is_opcode(0x3):
             if self.V[x()] == kk():
                 self.program_counter += 2
-                print(f"SKIPPING AT {self.program_counter}")
+                if self.opcode_debug:
+                    print(f"SKIPPING AT {self.program_counter}")
             return
         # SNE Vx, kk
         if is_opcode(0x4):
             if self.V[x()] != kk():
                 self.program_counter += 2
-                print(f"SKIPPING AT {self.program_counter}")
+                if self.opcode_debug:
+                    print(f"SKIPPING AT {self.program_counter}")
             return
         # SE Vx, Vy
         if is_opcode(0x5):
             if self.V[x()] == self.V[y()]:
                 self.program_counter += 2
-                print(f"SKIPPING AT {self.program_counter}")
+                if self.opcode_debug:
+                    print(f"SKIPPING AT {self.program_counter}")
             return
         # LD Vx, Vy
         if is_opcode(0x6):
@@ -190,7 +201,8 @@ class Chip8:
         if is_opcode(0x9):
             if self.V[x()] != self.V[y()]:
                 self.program_counter += 2
-                print(f"SKIPPING AT {self.program_counter}")
+                if self.opcode_debug:
+                    print(f"SKIPPING AT {self.program_counter}")
             return
         # LD I
         if is_opcode(0xA):
@@ -212,8 +224,10 @@ class Chip8:
             return
         # Two skips here
         if is_opcode(0xE):
-            print(f"NOT IMPLEMENTED {hex(opcode).upper()}")
-            return
+            mode = 4
+            if is_opcode(0x9E):
+                pass
+                #if self.Keyboard.keyDown(5)
         # There are several instructions under 0xF000
         if is_opcode(0xF):
             mode = 4
@@ -223,7 +237,13 @@ class Chip8:
                 return
             # LD Vx, K: Wait for keypress and store value in Vx
             if is_opcode(0x0A):
-                print(f"NOT IMPLEMENTED {hex(opcode).upper()}")
+                for event in pygame.event.get():
+                    while True:
+                        if event == pygame.KEYDOWN:
+                            if event.key in self.Keyboard.keyboard_map.keys:
+                                self.Keyboard.keyDown(event.key)
+                                self.V[x()] = self.Keyboard.keyboard[event.key]
+                                return
                 return
             # LD DT, Vx
             if is_opcode(0x15):

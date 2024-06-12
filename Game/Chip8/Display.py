@@ -20,11 +20,11 @@ class Display:
             [False for i in range(DISPLAY_HEIGHT)] for j in range(DISPLAY_WIDTH)
         ]
 
-    # @check_bounds
+    @check_bounds
     def set(self, x: int, y: int) -> None:
         self.pixels[x][y] = True
 
-    # @check_bounds
+    @check_bounds
     def is_set(self, x: int, y: int) -> bool:
         return self.pixels[x][y]
 

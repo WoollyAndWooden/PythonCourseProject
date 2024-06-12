@@ -1,6 +1,7 @@
 import pygame
 
 from Game.Chip8.Chip8 import Chip8
+from sys import argv
 from Game.Chip8.Config import (
     DISPLAY_MULTIPLIER,
     DISPLAY_WIDTH,
@@ -8,7 +9,6 @@ from Game.Chip8.Config import (
     FOREGROUND_COLOUR,
     BACKGROUND_COLOUR,
 )
-
 pygame.init()
 size = lambda x: x * DISPLAY_MULTIPLIER
 screen = pygame.display.set_mode((size(DISPLAY_WIDTH), size(DISPLAY_HEIGHT)))
@@ -17,12 +17,9 @@ running = True
 pause = False
 
 dt = 0
-logo = "Games/chip8-test-suite/1-chip8-logo.ch8"
-ibm = "Games/chip8-test-suite/2-ibm-logo.ch8"
-corax = "Games/chip8-test-suite/3-corax+.ch8"
-flags = "Games/chip8-test-suite/4-flags.ch8"
-GAME = "Games/INVADERS"
-chip8 = Chip8(flags)
+if len(argv) != 2:
+    raise Exception("Incorrect number of arguements")
+chip8 = Chip8(argv[1])
 
 screenDebug = False
 
@@ -30,6 +27,16 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        if event.type == pygame.KEYDOWN:
+            print(f"{event.key} pressed")
+            if event.key in chip8.Keyboard.keyboard_map.keys():
+                print(f"Pressed {event.key}")
+                chip8.Keyboard.keyDown(event.key)
+                print(chip8.Keyboard.keyState(event.key))
+        if event.type == pygame.KEYUP:
+            if event.key in chip8.Keyboard.keyboard_map.keys():
+                chip8.Keyboard.keyUp(event.key)
 
     screen.fill(BACKGROUND_COLOUR)
     if screenDebug:
@@ -61,7 +68,8 @@ while running:
 
     try:
         if not pause:
-            chip8.exec()
+            for i in range(0, 12):
+                chip8.exec()
     except Exception as err:
         pause = True
         print(f"Error ({err}) at PC {chip8.program_counter}")
